@@ -41,52 +41,41 @@ uploaded_file = st.file_uploader("Unggah foto soal kimia...", type=["jpg", "jpeg
 if uploaded_file is not None:
     img = Image.open(uploaded_file)
     
-    # --- OPTIMASI MOBILE: Resize Gambar ---
-    # Kita gunakan 450px sebagai standar lebar maksimal agar pas di layar HP
+    # 1. Resize gambar asli agar tidak terlalu berat
     max_width_mobile = 450 
     if img.width > max_width_mobile:
         ratio = max_width_mobile / float(img.width)
         new_height = int(float(img.height) * float(ratio))
         img = img.resize((max_width_mobile, new_height), Image.Resampling.LANCZOS)
 
-    # --- TAMPILAN 1: AREA CROP ---
+    # 2. Fitur Crop (Gunakan 'width')
     st.markdown("### 1. Pilih Bagian Soal")
-    
-    # canvas_width diatur ke max_width_mobile agar tidak overflow
     cropped_img = st_cropper(
         img, 
         realtime_update=True, 
-        box_color='#FF4B4B', # Warna merah agar lebih kontras
+        box_color='#FF4B4B', 
         aspect_ratio=None,
-        canvas_width=max_width_mobile 
+        width=max_width_mobile # Pakai width agar tidak TypeError
     )
     
     st.write("")
+    # use_container_width=True sangat penting untuk mobile!
     hitung_btn = st.button("🚀 Lakukan Perhitungan", use_container_width=True)
     st.divider()
 
-    # --- TAMPILAN 2: HASIL ANALISIS ---
+    # 3. Hasil Analisis (Tetap pakai Gemini 2.5 Flash)
     if hitung_btn:
         if cropped_img:
             st.markdown("### 2. Analisis & Solusi")
             with st.spinner("Gemini 2.5 Flash sedang memproses..."):
-                # Kita kirim gambar yang sudah di-crop ke Gemini
                 prompt = (
-                    "Kamu adalah asisten ahli kimia. Analisis gambar soal ini: "
-                    "1. Identifikasi teks soal. "
-                    "2. Jelaskan konsep kimianya secara singkat. "
-                    "3. Tuliskan rumus dalam LaTeX. "
-                    "4. Berikan langkah pengerjaan dan jawaban akhir yang akurat."
+                    "Analisis gambar soal kimia ini. Tulis ulang soalnya, "
+                    "jelaskan konsepnya, berikan rumus dalam LaTeX, dan "
+                    "berikan langkah pengerjaan yang sangat rinci."
                 )
-                
                 try:
                     response = model.generate_content([prompt, cropped_img])
                     st.success("Analisis Selesai!")
                     st.markdown(response.text)
-                    
-                    with st.expander("Lihat Referensi Gambar"):
-                        st.image(cropped_img, caption="Area yang dihitung", use_container_width=True)
                 except Exception as e:
-                    st.error(f"Terjadi kesalahan: {e}")
-        else:
-            st.warning("Silakan pilih area soal terlebih dahulu.")
+                    st.error(f"Error pada Gemini: {e}")
