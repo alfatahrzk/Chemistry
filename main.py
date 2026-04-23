@@ -23,14 +23,32 @@ if uploaded_file is not None:
         ratio = max_width / float(img.width)
         new_height = int(float(img.height) * float(ratio))
         img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+
+    st.markdown("""
+    <style>
+    /* Memaksa kontainer utama menggunakan lebar penuh di mobile */
+    .main .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Memastikan gambar dan cropper tidak melebihi lebar layar */
+    .stImage, .stCropper {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     # --- TAMPILAN ATAS: FITUR CROP ---
     st.markdown("### 1. Pilih Bagian Soal")
+    # Gunakan lebar yang lebih fleksibel
     cropped_img = st_cropper(
         img, 
         realtime_update=True, 
         box_color='#007bff', 
-        aspect_ratio=None
+        aspect_ratio=None,
+        canvas_width=None # Biarkan dia mengikuti container jika bisa
     )
     
     # Jarak pemisah agar tombol terlihat jelas
