@@ -1,5 +1,5 @@
 google-generativeai>=0.4.0
 groq>=0.4.2
-mistralai
+mistralai==0.1.0
 Pillow>=10.2.0
 streamlit-cropper>=0.2.1
