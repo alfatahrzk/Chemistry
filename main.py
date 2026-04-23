@@ -8,7 +8,7 @@ genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 # 2. PENGATURAN LAYOUT & CSS MOBILE
-st.set_page_config(layout="wide", page_title="ChemCompute Pro")
+st.set_page_config(layout="wide", page_title="FF Chemistry")
 st.markdown("""
     <style>
     .main .block-container { padding: 2rem 1rem; }
@@ -21,8 +21,8 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🧪 ChemCompute Pro")
-st.caption("Asisten Kimia AI - Powered by Maestro Routing")
+st.title("🧪 FF Chemistry")
+st.caption("Tanya apa aja tentang kimia, Baginda Fatah pasti bisa")
 
 # ==========================================
 # 3. DATABASE PROMPT SPESIALIS (KUMPULAN AGEN)
@@ -32,8 +32,8 @@ PROMPTS = {
         "Bertindaklah sebagai mentor Olimpiade Kimia (OSN) bernama Fatah. Target audiensmu adalah siswa SMA bernama Faura "
         "yang cerdas, analitis, dan terbiasa dengan soal hitungan tingkat lanjut. "
         "Fokuslah pada perhitungan Stoikiometri, Termokimia, Kesetimbangan, atau Elektrokimia. "
-        "Struktur jawaban: 1. Parameter soal, 2. Reaksi/Rumus (LaTeX), 3. Langkah stoikiometri logis, 4. Jawaban akhir."
-        "Berikan satu insight efisiensi dari Kak Fatah."
+        "Struktur jawaban: 1. Parameter soal, 2. Reaksi/Rumus (tulis dalam bentuk LaTeX), 3. Langkah stoikiometri logis, 4. Jawaban akhir."
+        "Berikan satu insight efisiensi dari Baginda Fatah."
     ),
     "KIMIA_ORGANIK": (
         "Bertindaklah sebagai mentor Olimpiade Kimia (OSN) bernama Fatah. Target audiensmu adalah siswa SMA bernama Faura. "
@@ -66,7 +66,7 @@ if uploaded_file is not None:
     cropped_img = st_cropper(img, realtime_update=True, box_color='#FF4B4B', aspect_ratio=None)
     
     st.write("")
-    hitung_btn = st.button("🚀 Lakukan Perhitungan", use_container_width=True)
+    hitung_btn = st.button("Hitung", use_container_width=True)
     st.divider()
 
     if hitung_btn:
@@ -93,7 +93,7 @@ if uploaded_file is not None:
                 st.info(f"Kategori Terdeteksi: **{kategori.replace('_', ' ')}**")
 
                 # --- PASS 2: SOLVING (MENGGUNAKAN PROMPT SPESIFIK) ---
-                with st.spinner(f"🧠 Kak Fatah sedang menyusun strategi untuk {kategori.replace('_', ' ').lower()}..."):
+                with st.spinner(f"Sebentar yaa Baginda Fatah sedang mikir.. {kategori.replace('_', ' ').lower()}..."):
                     final_prompt = PROMPTS[kategori]
                     
                     response = model.generate_content([final_prompt, cropped_img])
