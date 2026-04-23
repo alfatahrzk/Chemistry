@@ -3,18 +3,15 @@ import google.generativeai as genai
 from PIL import Image
 from streamlit_cropper import st_cropper
 
-# 1. KONFIGURASI KUNCI API GEMINI (Tetap sesuai permintaan)
+# 1. KONFIGURASI API GEMINI
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-# 2. PENGATURAN LAYOUT
+# 2. PENGATURAN LAYOUT & CSS MOBILE
 st.set_page_config(layout="wide", page_title="ChemCompute Pro")
-
 st.markdown("""
     <style>
-    .main .block-container {
-        padding: 2rem 1rem;
-    }
+    .main .block-container { padding: 2rem 1rem; }
     .stButton button {
         height: 3.5em;
         font-weight: bold;
@@ -25,54 +22,83 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 st.title("🧪 ChemCompute Pro")
-st.caption("Asisten Kimia AI - Mobile Friendly")
+st.caption("Asisten Kimia AI - Powered by Maestro Routing")
 
+# ==========================================
+# 3. DATABASE PROMPT SPESIALIS (KUMPULAN AGEN)
+# ==========================================
+PROMPTS = {
+    "KIMIA_FISIKA": (
+        "Bertindaklah sebagai mentor Olimpiade Kimia (OSN) bernama Fatah. Target audiensmu adalah siswa SMA bernama Faura "
+        "yang cerdas, analitis, dan terbiasa dengan soal hitungan tingkat lanjut. "
+        "Fokuslah pada perhitungan Stoikiometri, Termokimia, Kesetimbangan, atau Elektrokimia. "
+        "Struktur jawaban: 1. Parameter soal, 2. Reaksi/Rumus (LaTeX), 3. Langkah stoikiometri logis, 4. Jawaban akhir."
+        "Berikan satu insight efisiensi dari Kak Fatah."
+    ),
+    "KIMIA_ORGANIK": (
+        "Bertindaklah sebagai mentor Olimpiade Kimia (OSN) bernama Fatah. Target audiensmu adalah siswa SMA bernama Faura. "
+        "Ini adalah soal Kimia Organik. Jangan fokus pada hitungan matematis, tapi fokuslah pada analisis struktur! "
+        "Jelaskan identifikasi gugus fungsi, tatanama IUPAC, stereokimia, atau mekanisme reaksi (seperti SN1/SN2/Adisi) yang relevan secara logis. "
+        "Gunakan gaya bahasa akademik profesional namun engaging. Berikan kesimpulan produk atau struktur yang benar."
+    ),
+    "DEFAULT": (
+        "Bertindaklah sebagai mentor Olimpiade Kimia (OSN) bernama Fatah. Bantu Faura memahami dan menyelesaikan soal kimia ini "
+        "dengan penjelasan yang taktis, efisien, dan presisi secara ilmiah."
+    )
+}
+
+# ==========================================
+# 4. LOGIKA UTAMA APLIKASI
+# ==========================================
 uploaded_file = st.file_uploader("Unggah foto soal kimia...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     img = Image.open(uploaded_file)
     
-    # --- RESIZE ADALAH KUNCI ---
-    # Kita batasi lebar gambar di sini agar kanvas cropper otomatis mengecil
-    max_width_mobile = 400 # Sedikit lebih kecil agar lebih aman di semua HP
+    # Resize untuk Mobile
+    max_width_mobile = 400 
     if img.width > max_width_mobile:
         ratio = max_width_mobile / float(img.width)
         new_height = int(float(img.height) * float(ratio))
         img = img.resize((max_width_mobile, new_height), Image.Resampling.LANCZOS)
 
-    # --- TAMPILAN 1: AREA CROP (Hanya parameter basic) ---
     st.markdown("## Pilih Soal")
-    
-    # Kita hapus 'width' atau 'canvas_width' karena menyebabkan error
-    # Cropper akan otomatis mengikuti ukuran 'img' yang sudah di-resize di atas
-    cropped_img = st_cropper(
-        img, 
-        realtime_update=True, 
-        box_color='#FF4B4B', 
-        aspect_ratio=None 
-    )
+    cropped_img = st_cropper(img, realtime_update=True, box_color='#FF4B4B', aspect_ratio=None)
     
     st.write("")
     hitung_btn = st.button("🚀 Lakukan Perhitungan", use_container_width=True)
     st.divider()
 
-    # --- TAMPILAN 2: HASIL ANALISIS ---
     if hitung_btn:
         if cropped_img:
             st.markdown("## Analisis & Solusi")
-            with st.spinner("Gemini sedang bekerja..."):
-                prompt = (
-                    "Bertindaklah sebagai mentor Olimpiade Kimia (OSN) bernama Fatah. Target audiensmu adalah siswa SMA bernama Faura"
-                    "yang cerdas, analitis, dan terbiasa dengan soal-soal tingkat lanjut. "
-                    "Analisis gambar soal kimia ini dan berikan penyelesaian yang taktis, efisien, dan presisi secara ilmiah. "
-                    "DILARANG KERAS menggunakan sapaan kekanak-kanakan (seperti 'halo murid-murid', 'mari kita hitung bareng'). "
-                    "Gunakan gaya bahasa akademik profesional namun tetap *engaging*. "
-                    "Opsional: Berikan satu tips cepat atau 'insight' singkat terkait efisiensi perhitungan untuk tipe soal ini."
-                )
-                try:
-                    # Mengirim konten ke model (Jangan diubah sesuai permintaan)
-                    response = model.generate_content([prompt, cropped_img])
+            
+            try:
+                # --- PASS 1: ROUTING (KLASIFIKASI SOAL) ---
+                with st.spinner("🔍 Mendeteksi jenis soal kimia..."):
+                    router_prompt = (
+                        "Analisis gambar ini dengan sangat singkat. Tentukan apakah ini soal hitungan (seperti stoikiometri/elektrokimia) "
+                        "atau soal struktur molekul (kimia organik). "
+                        "Jawab HANYA dengan satu kata persis dari pilihan ini: KIMIA_FISIKA, KIMIA_ORGANIK, atau DEFAULT. "
+                        "Jangan tambahkan penjelasan apa pun."
+                    )
+                    kategori_response = model.generate_content([router_prompt, cropped_img])
+                    kategori = kategori_response.text.strip().upper()
+                    
+                    # Validasi output router, jika aneh, lempar ke DEFAULT
+                    if kategori not in PROMPTS:
+                        kategori = "DEFAULT"
+                        
+                # Menampilkan badge kategori ke pengguna
+                st.info(f"Kategori Terdeteksi: **{kategori.replace('_', ' ')}**")
+
+                # --- PASS 2: SOLVING (MENGGUNAKAN PROMPT SPESIFIK) ---
+                with st.spinner(f"🧠 Kak Fatah sedang menyusun strategi untuk {kategori.replace('_', ' ').lower()}..."):
+                    final_prompt = PROMPTS[kategori]
+                    
+                    response = model.generate_content([final_prompt, cropped_img])
                     st.success("Selesai!")
                     st.markdown(response.text)
-                except Exception as e:
-                    st.error(f"Gagal memproses gambar: {e}")
+                    
+            except Exception as e:
+                st.error(f"Gagal memproses gambar: {e}")
