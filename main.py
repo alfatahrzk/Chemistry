@@ -3,79 +3,73 @@ import google.generativeai as genai
 from PIL import Image
 from streamlit_cropper import st_cropper
 
-# 1. KONFIGURASI KUNCI API GEMINI (Tetap menggunakan 2.5-flash sesuai permintaan)
+# 1. KONFIGURASI KUNCI API GEMINI (Tetap sesuai permintaan)
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 # 2. PENGATURAN LAYOUT
 st.set_page_config(layout="wide", page_title="ChemCompute Pro")
 
-# CSS Tambahan untuk menyembunyikan overflow dan merapikan tampilan mobile
 st.markdown("""
     <style>
-    /* Menghilangkan padding berlebih di mobile */
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
+    .main .block-container {
+        padding: 2rem 1rem;
     }
-    /* Memastikan komponen cropper dan gambar responsif */
-    .stCropper, .img-container img {
-        width: 100% !important;
-        height: auto !important;
-    }
-    /* Membuat tombol lebih besar dan mudah diklik di HP */
     .stButton button {
-        height: 3em;
+        height: 3.5em;
         font-weight: bold;
+        background-color: #FF4B4B;
+        color: white;
     }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("🧪 ChemCompute Pro")
-st.caption("Solusi Kimia dalam Genggaman")
+st.caption("Asisten Kimia AI - Mobile Friendly")
 
 uploaded_file = st.file_uploader("Unggah foto soal kimia...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     img = Image.open(uploaded_file)
     
-    # 1. Resize gambar asli agar tidak terlalu berat
-    max_width_mobile = 450 
+    # --- RESIZE ADALAH KUNCI ---
+    # Kita batasi lebar gambar di sini agar kanvas cropper otomatis mengecil
+    max_width_mobile = 400 # Sedikit lebih kecil agar lebih aman di semua HP
     if img.width > max_width_mobile:
         ratio = max_width_mobile / float(img.width)
         new_height = int(float(img.height) * float(ratio))
         img = img.resize((max_width_mobile, new_height), Image.Resampling.LANCZOS)
 
-    # 2. Fitur Crop (Gunakan 'width')
+    # --- TAMPILAN 1: AREA CROP (Hanya parameter basic) ---
     st.markdown("### 1. Pilih Bagian Soal")
+    
+    # Kita hapus 'width' atau 'canvas_width' karena menyebabkan error
+    # Cropper akan otomatis mengikuti ukuran 'img' yang sudah di-resize di atas
     cropped_img = st_cropper(
         img, 
         realtime_update=True, 
         box_color='#FF4B4B', 
-        aspect_ratio=None,
-        width=max_width_mobile # Pakai width agar tidak TypeError
+        aspect_ratio=None 
     )
     
     st.write("")
-    # use_container_width=True sangat penting untuk mobile!
     hitung_btn = st.button("🚀 Lakukan Perhitungan", use_container_width=True)
     st.divider()
 
-    # 3. Hasil Analisis (Tetap pakai Gemini 2.5 Flash)
+    # --- TAMPILAN 2: HASIL ANALISIS ---
     if hitung_btn:
         if cropped_img:
             st.markdown("### 2. Analisis & Solusi")
-            with st.spinner("Gemini 2.5 Flash sedang memproses..."):
+            with st.spinner("Gemini sedang bekerja..."):
                 prompt = (
                     "Analisis gambar soal kimia ini. Tulis ulang soalnya, "
                     "jelaskan konsepnya, berikan rumus dalam LaTeX, dan "
                     "berikan langkah pengerjaan yang sangat rinci."
                 )
                 try:
+                    # Mengirim konten ke model (Jangan diubah sesuai permintaan)
                     response = model.generate_content([prompt, cropped_img])
-                    st.success("Analisis Selesai!")
+                    st.success("Selesai!")
                     st.markdown(response.text)
                 except Exception as e:
-                    st.error(f"Error pada Gemini: {e}")
+                    st.error(f"Gagal memproses gambar: {e}")
