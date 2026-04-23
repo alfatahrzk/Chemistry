@@ -106,8 +106,8 @@ if uploaded_file is not None:
                 
                 # Mengecek apakah ada kata kunci '429' atau 'quota' di dalam pesan error
                 if "429" in error_message or "quota" in error_message:
-                    st.warning("⏳ Waduh Faura, kayanya si Fatah lagi pusing "
-                               "Coba kamu calling dia. ")
+                    st.warning("⏳ Waduh Faura, kayanya si Fatah lagi pusing")
+                    st.warning("Sorry yaa, aku lagi gabisa mikirr :(")
                 else:
                     # Jika errornya bukan karena kuota, tampilkan error aslinya (opsional bisa disembunyikan juga)
                     st.error("Gagal memproses gambar. Fatah lagi nge-debug sistemnya sebentar ya.")
