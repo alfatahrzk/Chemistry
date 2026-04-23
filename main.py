@@ -41,7 +41,7 @@ if uploaded_file is not None:
         img = img.resize((max_width_mobile, new_height), Image.Resampling.LANCZOS)
 
     # --- TAMPILAN 1: AREA CROP (Hanya parameter basic) ---
-    st.markdown("### 1. Pilih Bagian Soal")
+    st.markdown("## Pilih Soal")
     
     # Kita hapus 'width' atau 'canvas_width' karena menyebabkan error
     # Cropper akan otomatis mengikuti ukuran 'img' yang sudah di-resize di atas
@@ -59,7 +59,7 @@ if uploaded_file is not None:
     # --- TAMPILAN 2: HASIL ANALISIS ---
     if hitung_btn:
         if cropped_img:
-            st.markdown("### 2. Analisis & Solusi")
+            st.markdown("## Analisis & Solusi")
             with st.spinner("Gemini sedang bekerja..."):
                 prompt = (
                     "Bertindaklah sebagai mentor Olimpiade Kimia (OSN) bernama Fatah. Target audiensmu adalah siswa SMA bernama Faura"
@@ -67,11 +67,6 @@ if uploaded_file is not None:
                     "Analisis gambar soal kimia ini dan berikan penyelesaian yang taktis, efisien, dan presisi secara ilmiah. "
                     "DILARANG KERAS menggunakan sapaan kekanak-kanakan (seperti 'halo murid-murid', 'mari kita hitung bareng'). "
                     "Gunakan gaya bahasa akademik profesional namun tetap *engaging*. "
-                    "Struktur jawaban: "
-                    "1. Tulis intisari parameter soal. "
-                    "2. Tuliskan reaksi setengah sel yang relevan (gunakan LaTeX). "
-                    "3. Tunjukkan langkah stoikiometri secara terstruktur dan logis. "
-                    "4. Berikan jawaban akhir yang jelas. "
                     "Opsional: Berikan satu tips cepat atau 'insight' singkat terkait efisiensi perhitungan untuk tipe soal ini."
                 )
                 try:
