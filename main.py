@@ -141,13 +141,24 @@ if uploaded_file:
                         f"1. Verifikasi Soal: Cek angka-angka aneh hasil scan. Perbaiki pakai logika kimia.\n"
                         f"2. Berpikir Mendalam: Bedah hukum kimianya (Stoikiometri, Termokimia, dll).\n"
                         f"3. Perhitungan: Hitung langkah demi langkah dengan presisi tinggi, tapi jelaskan dengan bahasa yang manusiawi.\n\n"
-                        f"FORMAT OUTPUT (STRICT):\n"
+                        
+                        f"FORMAT OUTPUT (STRICT - WAJIB DIIKUTI):\n"
+                        f"1. DILARANG KERAS menggunakan `\\[ ... \\]`, `\\( ... \\)`, atau `[ ... ]` untuk rumus matematika.\n"
+                        f"2. WAJIB gunakan `$$ ... $$` untuk rumus yang berdiri sendiri (block math/equation).\n"
+                        f"3. WAJIB gunakan `$ ... $` untuk simbol kimia atau angka di dalam teks (inline math).\n"
+                        f"4. Berikan SPASI ENTER GANDA (\\n\\n) di setiap akhir paragraf atau setiap pergantian langkah agar tulisan tidak menumpuk!\n\n"
+
                         f"### IDENTIFIKASI\n"
-                        f"Jelaskan topik dan data yang ada. Awali dengan sapaan hangat khas Fatah.\n\n"
+                        f"Jelaskan topik dan data yang ada. Awali dengan sapaan hangat khas Fatah (misal: 'oke, kita bedah pelan-pelan ya...').\n\n"
+
                         f"### EKSEKUSI\n"
-                        f"Uraikan penyelesaiannya. WAJIB gunakan blok LaTeX.\n\n"
+                        f"Uraikan penyelesaiannya. Tuliskan proses hitungannya secara rapi ke bawah. "
+                        f"Ingat, pisahkan setiap langkah dengan enter ganda. "
+                        f"Contoh format rumus yang benar:\n"
+                        f"$$ n_{{O_2}} = \\frac{{5,6 \\text{{ L}}}}{{22,4 \\text{{ L/mol}}}} = 0,25 \\text{{ mol}} $$\n\n"
+
                         f"### KESIMPULAN\n"
-                        f"Berikan jawaban akhir yang tegas.\n\n"
+                        f"Berikan jawaban akhir yang tegas. Tambahkan sedikit apresiasi (misal: 'yeyy ketemu! gampang kannnn?').\n\n"
                     )
 
                     # LOGIKA MULTI-ENGINE
