@@ -93,7 +93,7 @@ if uploaded_file is not None:
                 st.info(f"Kategori Terdeteksi: **{kategori.replace('_', ' ')}**")
 
                 # --- PASS 2: SOLVING (MENGGUNAKAN PROMPT SPESIFIK) ---
-                with st.spinner(f"Sebentar yaa Baginda Fatah sedang mikir.. {kategori.replace('_', ' ').lower()}..."):
+                with st.spinner(f"Sebentar yaa Baginda Fatah sedang mikir {kategori.replace('_', ' ').lower()}..."):
                     final_prompt = PROMPTS[kategori]
                     
                     response = model.generate_content([final_prompt, cropped_img])
