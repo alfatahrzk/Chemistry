@@ -101,4 +101,14 @@ if uploaded_file is not None:
                     st.markdown(response.text)
                     
             except Exception as e:
-                st.error(f"Gagal memproses gambar: {e}")
+                # Mengubah pesan error menjadi string huruf kecil semua untuk dicek
+                error_message = str(e).lower()
+                
+                # Mengecek apakah ada kata kunci '429' atau 'quota' di dalam pesan error
+                if "429" in error_message or "quota" in error_message:
+                    st.warning("⏳ Waduh Faura, kayanya si Fatah lagi pusing "
+                               "Coba kamu calling dia. ")
+                else:
+                    # Jika errornya bukan karena kuota, tampilkan error aslinya (opsional bisa disembunyikan juga)
+                    st.error("Gagal memproses gambar. Fatah lagi nge-debug sistemnya sebentar ya.")
+                    # st.write(e) # Hilangkan tanda pagar jika kamu sebagai developer ingin tetap melihat error log di layar
