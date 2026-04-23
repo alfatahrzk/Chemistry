@@ -62,9 +62,15 @@ if uploaded_file is not None:
             st.markdown("### 2. Analisis & Solusi")
             with st.spinner("Gemini sedang bekerja..."):
                 prompt = (
-                    "Analisis gambar soal kimia ini. Tulis ulang soalnya, "
-                    "jelaskan konsepnya, berikan rumus dalam LaTeX, dan "
-                    "berikan langkah pengerjaan yang sangat rinci."
+                    "Bertindaklah sebagai guru kimia yang ramah, asyik, dan sabar. "
+                    "Tolong bantu muridmu menyelesaikan soal kimia di gambar ini dengan gaya bahasa yang mengalir, hangat, dan komunikatif layaknya manusia, bukan AI atau robot. "
+                    "DILARANG KERAS menggunakan format list kaku seperti '1. Penulisan Soal' atau '2. Penjelasan Konsep'. "
+                    "Buat alur penjelasannya seperti ini: "
+                    "Pertama, sapa murid dan tuliskan ulang intisari soalnya dengan bahasa santai. "
+                    "Kedua, ajak murid memahami logika konsep dasarnya dulu sebelum menghitung (ingatkan soal elektrolisis, reaksi di anoda, dan kondisi STP). "
+                    "Ketiga, berikan rumus yang dipakai dalam format LaTeX agar rapi. "
+                    "Keempat, tuntun langkah perhitungannya perlahan-lahan dari mencari mol hingga muatan listrik, seolah kamu sedang menulis di papan tulis sambil ngobrol. "
+                    "Terakhir, simpulkan jawaban akhirnya dan berikan kalimat penyemangat yang natural."
                 )
                 try:
                     # Mengirim konten ke model (Jangan diubah sesuai permintaan)
