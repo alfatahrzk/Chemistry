@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 from groq import Groq
-from mistralai import MistralClient # Library baru untuk Mistral
+from mistralai.client import MistralClient # Library baru untuk Mistral
 import base64
 from PIL import Image
 from io import BytesIO
